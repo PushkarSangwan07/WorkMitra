@@ -8,6 +8,7 @@ export function ThemeProvider({ children }) {
     
 
     return savedTheme ? savedTheme : 'dark';
+    return savedTheme ? savedTheme : 'light';
   });
 
   useEffect(() => {
