@@ -26,7 +26,7 @@ const sendEmail = async ({ to, subject, html }) => {
 
   try {
     const { data, error } = await resend.emails.send({
-      from: process.env.EMAIL_FROM || 'WorkMitra <onboarding@resend.dev>',
+      from:  'WorkMitra <onboarding@resend.dev>',
       to: [to],
       subject,
       html,
