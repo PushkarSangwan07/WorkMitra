@@ -29,19 +29,14 @@ const register = asyncHandler(async (req, res) => {
     throw new ApiError(409, 'An account with this email already exists');
   }
 
-  // Generate a 6-digit OTP and expiration time (10 minutes)
-  const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-  const otpExpire = Date.now() + 10 * 60 * 1000; 
-
+  // Create user with isEmailVerified set to true immediately (skips email requirement)
   const user = await User.create({
     name,
     email,
     password,
     phone,
     role: role || 'customer',
-    otpCode,
-    otpExpire,
-    isEmailVerified: false
+    isEmailVerified: true // Automatically verified!
   });
 
   // If registering as a worker, create a minimal WorkerProfile shell
@@ -53,51 +48,53 @@ const register = asyncHandler(async (req, res) => {
     });
   }
 
-  // Send the OTP Email
-  await sendVerificationOtpEmail(email, name, otpCode);
+  // Generate tokens instantly so they are logged in right after registering
+  const accessToken = user.generateAccessToken();
+  const refreshToken = user.generateRefreshToken();
 
-  // Notice we DO NOT generate tokens here anymore. They must verify first!
+  user.refreshToken = refreshToken;
+  user.lastLogin = new Date();
+  await user.save({ validateBeforeSave: false });
+
+  res.cookie('refreshToken', refreshToken, refreshTokenCookieOptions);
+
   return res
     .status(201)
-    .json(new ApiResponse(201, { email }, 'Registered successfully. Please check your email for the OTP.'));
+    .json(
+      new ApiResponse(
+        201, 
+        { user: sanitizeUser(user), accessToken }, 
+        'Registered successfully!'
+      )
+    );
 });
 
 
-// POST /api/auth/verify-email
+// POST /api/auth/verify-email (Kept just in case your frontend still calls it, but accepts ANY OTP)
 const verifyEmail = asyncHandler(async (req, res) => {
-  const { email, otpCode } = req.body;
+  const { email } = req.body;
 
-  // 1. Verify the OTP is correct and not expired
-  const user = await User.findOne({
-    email,
-    otpCode,
-    otpExpire: { $gt: Date.now() }, 
-  });
+  // Find user by email, ignore what code they typed
+  const user = await User.findOne({ email });
 
   if (!user) {
-    throw new ApiError(400, 'Invalid or expired OTP code.');
+    throw new ApiError(404, 'User not found.');
   }
 
-  // 2. Mark user as verified and clear the OTP fields so they can't be reused
+  // Mark as verified
   user.isEmailVerified = true;
   user.otpCode = undefined;
   user.otpExpire = undefined;
 
-  // 3. AUTO-LOGIN LOGIC: Generate tokens exactly like the login function
   const accessToken = user.generateAccessToken();
   const refreshToken = user.generateRefreshToken();
 
-  // 4. Update session variables
   user.refreshToken = refreshToken;
   user.lastLogin = new Date();
-  
-  // Save the user updates
   await user.save({ validateBeforeSave: false });
 
-  // 5. Set the secure cookie (Make sure refreshTokenCookieOptions is defined above this!)
   res.cookie('refreshToken', refreshToken, refreshTokenCookieOptions);
 
-  // 6. Return the exact same ApiResponse format as login
   return res
     .status(200)
     .json(
