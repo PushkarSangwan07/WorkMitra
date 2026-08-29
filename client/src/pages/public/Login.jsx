@@ -269,40 +269,7 @@ const redirectBasedOnRole = (userData) => {
           </div>
         </div>
 
-        {/* Integrated Demo Credentials */}
-        <div className="mt-6">
-          <button 
-            onClick={() => setShowDemo(!showDemo)} 
-            className="w-full flex items-center justify-center gap-2 text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest hover:text-zinc-900 dark:hover:text-white transition-colors"
-          >
-            Demo Credentials
-            <svg className={`w-3 h-3 transition-transform duration-300 ${showDemo ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-          </button>
-          
-          <AnimatePresence>
-            {showDemo && (
-              <motion.div 
-                initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
-                className="overflow-hidden mt-4 bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-xl border border-zinc-200 dark:border-white/10 rounded-2xl"
-              >
-                <div className="p-2 flex flex-col gap-1">
-                  <button onClick={() => fillDemo('admin@workmitra.com', 'Admin@1234')} className="flex items-center justify-between p-3 rounded-xl hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors">
-                    <div className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-orange-500" /><span className="text-sm font-bold text-zinc-900 dark:text-white">Admin</span></div>
-                    <span className="text-xs font-mono text-zinc-500">admin@workmitra.com</span>
-                  </button>
-                  <button onClick={() => fillDemo('ramesh.kumar@workmitra.com', 'Worker@1234')} className="flex items-center justify-between p-3 rounded-xl hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors">
-                    <div className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-blue-500" /><span className="text-sm font-bold text-zinc-900 dark:text-white">Worker</span></div>
-                    <span className="text-xs font-mono text-zinc-500">ramesh.kumar@workmitra.com</span>
-                  </button>
-                  <button onClick={() => fillDemo('priya.sharma@gmail.com', 'Customer@1234')} className="flex items-center justify-between p-3 rounded-xl hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors">
-                    <div className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-green-500" /><span className="text-sm font-bold text-zinc-900 dark:text-white">Customer</span></div>
-                    <span className="text-xs font-mono text-zinc-500">priya.sharma@gmail.com</span>
-                  </button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+       
       </motion.div>
 
       {/* --- 1. OTP MODAL (For Unverified Logins) --- */}
