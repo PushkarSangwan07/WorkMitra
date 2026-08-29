@@ -257,7 +257,11 @@ const forgotPassword = asyncHandler(async (req, res) => {
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
     await user.save({ validateBeforeSave: false });
-    throw new ApiError(500, 'Failed to send reset email. Please try again later.');
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Email failed to send', 
+      debugError: err.message || err.toString() 
+    });
   }
 
   return res.status(200).json(genericResponse);
