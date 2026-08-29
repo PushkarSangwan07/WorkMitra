@@ -1,9 +1,16 @@
 const { Resend } = require('resend');
 
-// Initialize Resend if API key is present
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+// Safely initialize Resend client
+const getResendClient = () => {
+  if (!process.env.RESEND_API_KEY) {
+    return null;
+  }
+  return new Resend(process.env.RESEND_API_KEY);
+};
 
 const sendEmail = async ({ to, subject, html }) => {
+  const resend = getResendClient();
+
   // Fallback for local testing if Resend API key is not configured
   if (!resend) {
     console.log('\n──────────────────────────────────────────');
@@ -26,21 +33,21 @@ const sendEmail = async ({ to, subject, html }) => {
 
   try {
     const { data, error } = await resend.emails.send({
-      from:  'WorkMitra <onboarding@resend.dev>',
+      from: 'WorkMitra <onboarding@resend.dev>',
       to: [to],
       subject,
       html,
     });
 
     if (error) {
-      console.error('Resend API Error:', error);
-      throw new Error(error.message || 'Failed to send email via Resend');
+      console.error('Resend API Error Object:', JSON.stringify(error, null, 2));
+      throw new Error(error.message || JSON.stringify(error));
     }
 
     return data;
   } catch (err) {
-    console.error('Email Dispatch Error:', err);
-    throw err;
+    console.error('Email Dispatch Caught Error:', err);
+    throw new Error(err.message || 'Failed to send email via Resend service');
   }
 };
 
