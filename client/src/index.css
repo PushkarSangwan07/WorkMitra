@@ -1,0 +1,145 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { scroll-behavior: smooth; box-sizing: border-box; }
+
+  html {
+  background: #ffffff;
+}
+
+.dark html {
+  background:#0a0a0a;
+}
+
+
+body {
+  font-family:'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing:antialiased;
+  background:#ffffff;
+  color:#111827;
+}
+
+
+.dark body {
+  background:#0a0a0a;
+  color:#ffffff;
+}
+ 
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: #0a0a0a; }
+  ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 999px; }
+  ::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
+
+  /* Selection */
+  ::selection { background: rgba(232,103,58,0.25); color: #fff; }
+}
+
+@layer components {
+  /* ── Buttons ── */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2
+           px-5 py-2.5 rounded-full
+           bg-orange-500 hover:bg-orange-600 active:bg-orange-700
+           text-white text-sm font-semibold
+           transition-all duration-200
+           shadow-orange-glow hover:shadow-none
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+  @apply inline-flex items-center justify-center gap-2
+           px-5 py-2.5 rounded-full
+           bg-orange-500 hover:bg-orange-600 active:bg-orange-700
+           text-white text-sm font-semibold
+           transition-all duration-200
+           shadow-orange-glow hover:shadow-none
+           disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+  .btn-dark {
+    @apply inline-flex items-center justify-center gap-2
+           px-5 py-2.5 rounded-full
+           bg-[#1a1a1a] hover:bg-[#222222] border border-white/10
+           text-white text-sm font-semibold
+           transition-all duration-200;
+  }
+
+  /* ── Input ── */
+  .input {
+    @apply w-full px-4 py-3 rounded-xl
+           bg-[#1a1a1a] border border-white/10
+           text-white placeholder-white/30 text-sm
+           focus:outline-none focus:border-orange-500/60 focus:ring-1 focus:ring-orange-500/30
+           transition-all duration-200;
+  }
+
+  /* ── Card ── */
+ .card {
+  @apply 
+    bg-white dark:bg-[#141414]
+    border border-gray-200 dark:border-white/[0.06]
+    rounded-2xl
+    shadow-card hover:shadow-card-hover
+    transition-all duration-300;
+}
+
+.card-dark {
+  @apply
+    bg-gray-50 dark:bg-[#111111]
+    border border-gray-200 dark:border-white/[0.06]
+    rounded-2xl;
+}
+
+  /* ── Badge ── */
+  .badge {
+    @apply inline-flex items-center gap-1.5 text-xs font-semibold
+           px-2.5 py-1 rounded-full;
+  }
+
+  /* ── Section label ── */
+  .section-label {
+    @apply text-xs font-bold uppercase tracking-[0.15em] text-orange-500;
+  }
+
+  /* ── Shimmer ── */
+  .shimmer {
+    background: linear-gradient(90deg, #1a1a1a 25%, #242424 50%, #1a1a1a 75%);
+    background-size: 200% 100%;
+    animation: shimmer 2s linear infinite;
+  }
+}
+
+/* Page transition */
+main { animation: fadeUp 0.3s ease-out both; }
+
+/* Orange underline for headings */
+.orange-underline {
+  background: linear-gradient(to right, #e8673a, #f97240);
+  background-repeat: no-repeat;
+  background-size: 100% 3px;
+  background-position: 0 100%;
+}
+
+/* Hero gradient */
+.hero-bg {
+  background: #0a0a0a;
+}
+
+/* Dark card with subtle top border */
+.card-featured {
+  background: #141414;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-top: 1px solid rgba(232,103,58,0.3);
+  border-radius: 16px;
+}
+
+/* Worker photo card overlay gradient */
+.photo-overlay {
+  background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
+}

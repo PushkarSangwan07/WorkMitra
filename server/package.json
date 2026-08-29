@@ -1,0 +1,37 @@
+{
+  "name": "workmitra-server",
+  "version": "1.0.0",
+  "description": "WorkMitra backend - MERN skilled labor marketplace",
+  "main": "server.js",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^1.41.3",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^7.2.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.3.4",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.13",
+    "razorpay": "^2.9.8",
+    "socket.io": "^4.7.5",
+    "xss-clean": "^0.1.4",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}

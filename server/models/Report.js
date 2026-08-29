@@ -1,0 +1,34 @@
+// server/models/Report.model.js
+const mongoose = require('mongoose');
+const reportSchema = new mongoose.Schema(
+  {
+    reporter: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User', // The Customer who is reporting
+      required: true,
+    },
+    reportedWorker: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User', // The Worker being reported
+      required: true,
+    },
+    reason: {
+      type: String,
+      required: true,
+      enum: ['inappropriate_behavior', 'fraud', 'unsafe', 'fake_profile', 'other'],
+    },
+    details: {
+      type: String,
+      trim: true,
+    },
+    status: {
+      type: String,
+      enum: ['pending', 'reviewed', 'resolved', 'dismissed'],
+      default: 'pending',
+    },
+  },
+  { timestamps: true }
+);
+
+
+module.exports = mongoose.model('Report', reportSchema);
