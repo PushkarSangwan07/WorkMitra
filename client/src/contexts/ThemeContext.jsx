@@ -7,7 +7,6 @@ export function ThemeProvider({ children }) {
     const savedTheme = localStorage.getItem('theme');
     
 
-    return savedTheme ? savedTheme : 'dark';
     return savedTheme ? savedTheme : 'light';
   });
 
