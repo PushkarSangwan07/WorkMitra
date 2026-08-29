@@ -1,24 +1,16 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-const createTransporter = () => {
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT) || 587,
-    secure: false, // true for 465, false for other ports
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
-};
+// Initialize Resend if API key is present
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 const sendEmail = async ({ to, subject, html }) => {
-  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+  // Fallback for local testing if Resend API key is not configured
+  if (!resend) {
     console.log('\n──────────────────────────────────────────');
-    console.log(`📧  EMAIL NOT SENT (SMTP not configured)`);
+    console.log(`📧  EMAIL NOT SENT (Resend API Key not configured)`);
     console.log(`To:      ${to}`);
     console.log(`Subject: ${subject}`);
-    // Extract any URL or OTP from the HTML for easy dev testing
+    
     const urlMatch = html.match(/href="(https?:\/\/[^"]+)"/);
     const otpMatch = html.match(/<strong[^>]*>([\d]{6})<\/strong>/);
     
@@ -32,14 +24,24 @@ const sendEmail = async ({ to, subject, html }) => {
     return;
   }
 
-  const transporter = createTransporter();
+  try {
+    const { data, error } = await resend.emails.send({
+      from: process.env.EMAIL_FROM || 'WorkMitra <onboarding@resend.dev>',
+      to: [to],
+      subject,
+      html,
+    });
 
-  await transporter.sendMail({
-    from: process.env.EMAIL_FROM || 'WorkMitra <no-reply@workmitra.com>',
-    to,
-    subject,
-    html,
-  });
+    if (error) {
+      console.error('Resend API Error:', error);
+      throw new Error(error.message || 'Failed to send email via Resend');
+    }
+
+    return data;
+  } catch (err) {
+    console.error('Email Dispatch Error:', err);
+    throw err;
+  }
 };
 
 const sendPasswordResetEmail = async (to, resetUrl) => {
@@ -57,8 +59,6 @@ const sendPasswordResetEmail = async (to, resetUrl) => {
   });
 };
 
-// --- NEW FEATURES START HERE ---
-
 const sendVerificationOtpEmail = async (to, name, otpCode) => {
   await sendEmail({
     to,
@@ -75,8 +75,7 @@ const sendVerificationOtpEmail = async (to, name, otpCode) => {
 };
 
 const sendBanAppealEmailToAdmin = async (worker, message) => {
-  // Sends to your configured support email, or falls back to your SMTP user
-  const adminEmail = process.env.SUPPORT_EMAIL || process.env.SMTP_USER || 'support@workmitra.com';
+  const adminEmail = process.env.SUPPORT_EMAIL || process.env.ADMIN_EMAIL || 'support@workmitra.com';
   
   await sendEmail({
     to: adminEmail,
@@ -97,10 +96,7 @@ const sendBanAppealEmailToAdmin = async (worker, message) => {
 };
 
 const sendBanNotificationEmail = async (email, name, reason) => {
-  // Use your live URL in production, fallback to localhost for testing
   const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
-  
-  // This creates a link like: http://localhost:5173/login?appeal=true&email=worker@example.com
   const appealLink = `${clientUrl}/login?appeal=true&email=${encodeURIComponent(email)}`;
 
   await sendEmail({

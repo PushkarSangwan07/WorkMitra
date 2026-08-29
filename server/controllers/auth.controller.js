@@ -110,28 +110,7 @@ const verifyEmail = asyncHandler(async (req, res) => {
 });
 
 
-// POST /api/auth/verify-email (NEW FUNCTION)
-// const verifyEmail = asyncHandler(async (req, res) => {
-//   const { email, otpCode } = req.body;
 
-//   const user = await User.findOne({
-//     email,
-//     otpCode,
-//     otpExpire: { $gt: Date.now() }, // Ensures token isn't expired
-//   });
-
-//   if (!user) {
-//     throw new ApiError(400, 'Invalid or expired OTP code.');
-//   }
-
-//   // Mark user as verified and clear the OTP fields
-//   user.isEmailVerified = true;
-//   user.otpCode = undefined;
-//   user.otpExpire = undefined;
-//   await user.save({ validateBeforeSave: false });
-
-//   return res.status(200).json(new ApiResponse(200, null, 'Email verified successfully! You can now log in.'));
-// });
 
 
 // POST /api/auth/resend-otp
