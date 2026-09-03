@@ -119,8 +119,12 @@ const getMyProfile = asyncHandler(async (req, res) => {
     'name avatar phone email'
   );
 
+  // 🚨 FIX: Agar profile nahi mili (naya worker hai), toh 404 error mat feko. 
+  // Iske bajaye success true aur worker: null bhejo taaki frontend use Onboarding par bhej sake!
   if (!worker) {
-    throw new ApiError(404, 'Worker profile not found');
+    return res.status(200).json(
+      new ApiResponse(200, { worker: null, needsOnboarding: true }, 'Worker profile not found. Please complete onboarding.')
+    );
   }
 
   return res.status(200).json(new ApiResponse(200, { worker }));

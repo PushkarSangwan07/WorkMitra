@@ -29,15 +29,12 @@ const sanitizeUser = (user) => ({
 
 // POST /api/auth/register
 const register = asyncHandler(async (req, res) => {
-  const { name, email, password, phone, role } = req.body;
-
+  let { name, email, password, phone, role } = req.body;
 
   if (role === 'worker' && !phone) {
     throw new ApiError(400, 'Phone number is required for workers to receive WhatsApp messages.');
   }
 
-  // 2. Agar customer ne phone nahi diya, toh empty string ko undefined bana do
-  // Taaki MongoDB ka `sparse: true` perfectly kaam kare aur duplicate error na aaye
   if (!phone || phone.trim() === '') {
     phone = undefined;
   }
@@ -51,7 +48,7 @@ const register = asyncHandler(async (req, res) => {
   const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
   const otpExpire = new Date(Date.now() + 10 * 60 * 1000); 
 
-  // 2. Create user with isEmailVerified = FALSE aur OTP save karein
+  // 2. Create user with isEmailVerified = FALSE
   const user = await User.create({
     name,
     email,
@@ -63,13 +60,7 @@ const register = asyncHandler(async (req, res) => {
     otpExpire: otpExpire
   });
 
-  if (user.role === 'worker') {
-    await WorkerProfile.create({
-      user: user._id,
-      profession: 'Not specified',
-      rateAmount: 0,
-    });
-  }
+  
 
   // 3. Send REAL Email via Mailjet
   await sendVerificationOtpEmail(user.email, user.name, generatedOtp);
