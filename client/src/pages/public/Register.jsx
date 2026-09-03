@@ -6,7 +6,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api'; 
 
 export default function Register() {
-  const [formData, setFormData] = useState({ name: '', email: '', password: '', role: 'customer' });
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', password: '', role: 'customer' });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   
@@ -16,10 +16,9 @@ export default function Register() {
   const [isVerifying, setIsVerifying] = useState(false);
   const [isResending, setIsResending] = useState(false);
 
-  const { register, autoLogin } = useAuth(); // 👉 Added autoLogin here
+  const { register, verifyEmail } = useAuth(); 
   const navigate = useNavigate();
 
-  // Helper function to handle role-based redirection consistently
   const redirectBasedOnRole = (userData) => {
     const role = userData?.role?.toLowerCase();
 
@@ -30,7 +29,6 @@ export default function Register() {
       navigate('/search', { replace: true });
     } 
     else if (role === 'worker') {
-      // New workers registering here will have an empty profile, so send them straight to onboarding!
       navigate('/worker/onboarding', { replace: true });
     } 
     else {
@@ -40,13 +38,26 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // 🚨 FIX: Frontend Password Validation (Before hitting API)
+    if (formData.password.length < 8) {
+      return toast.error('Password must be at least 8 characters long. 🔒');
+    }
+    
+    // Check if password contains at least one number
+    if (!/\d/.test(formData.password)) {
+      return toast.error('Password must contain at least one number (0-9). 🔢');
+    }
+
     setIsLoading(true);
     try {
       await register(formData);
       toast.success('Account created! Please check your email.');
       setShowOtpModal(true); 
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Registration failed. Please try again.');
+      // Backend se aane wale errors ko bhi clean dikhane ke liye
+      const errorMsg = error.response?.data?.message || 'Registration failed. Please try again.';
+      toast.error(errorMsg);
     } finally {
       setIsLoading(false);
     }
@@ -58,18 +69,12 @@ export default function Register() {
     
     setIsVerifying(true);
     try {
-      // 1. Verify email and catch the token/user data returned by your updated backend
-      const response = await api.post('/auth/verify-email', { email: formData.email, otpCode });
-      const { user, accessToken } = response.data.data; 
-      
-      // 2. Instantly log them in using AuthContext!
-      autoLogin(user, accessToken);
+      const verifiedUser = await verifyEmail(formData.email, otpCode);
       
       toast.success('Email verified successfully! Welcome to WorkMitra 🎉');
       setShowOtpModal(false);
       
-      // 3. Automatically route them based on role without visiting the login page
-      redirectBasedOnRole(user);
+      redirectBasedOnRole(verifiedUser);
 
     } catch (error) {
       toast.error(error.response?.data?.message || 'Invalid or expired OTP.');
@@ -149,11 +154,39 @@ export default function Register() {
               <div className="relative group">
                 <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-orange-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                 <input
-                  type="text" required value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} placeholder="Enter Your Full Name "
+                  type="text" required value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} placeholder="Enter Your Full Name"
                   className="w-full h-12 rounded-xl border border-zinc-200 dark:border-white/10 bg-zinc-50/50 dark:bg-black/50 pl-11 pr-4 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all"
                 />
               </div>
             </div>
+
+            {/* 🚨 CONDITIONAL RENDERING: Phone Input (ONLY FOR WORKERS) */}
+            <AnimatePresence>
+              {formData.role === 'worker' && (
+                <motion.div 
+                  initial={{ opacity: 0, height: 0 }} 
+                  animate={{ opacity: 1, height: 'auto' }} 
+                  exit={{ opacity: 0, height: 0 }}
+                  className="space-y-2 overflow-hidden"
+                >
+                  <label className="text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-widest ml-1">Phone Number (Required for Workers)</label>
+                  <div className="relative group">
+                    <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-orange-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                    <input
+                      type="tel" 
+                      required={formData.role === 'worker'} // Sirf worker ke liye required
+                      value={formData.phone} 
+                      onChange={(e) => setFormData({...formData, phone: e.target.value})} 
+                      placeholder="10-digit WhatsApp number"
+                      className="w-full h-12 rounded-xl border border-zinc-200 dark:border-white/10 bg-zinc-50/50 dark:bg-black/50 pl-11 pr-4 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all"
+                    />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+        
 
             {/* Email Input */}
             <div className="space-y-2">
@@ -222,18 +255,6 @@ export default function Register() {
               <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-6">
                 We sent a 6-digit code to <strong className="text-zinc-900 dark:text-white">{formData.email}</strong>
               </p>
-
-              <div className="mb-6 p-3 bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/20 rounded-xl">
-                <p className="text-xs font-bold text-orange-600 dark:text-orange-400">
-                  🛠 TEST MODE ACTIVE
-                </p>
-                <p className="text-[11px] text-orange-700/70 dark:text-orange-300/70 mt-1">
-                  Email services are temporarily bypassed for testing. <br/> 
-                  <strong>Enter ANY 6 digits (e.g., 123456) to continue.</strong>
-                </p>
-              </div>
-
-
 
               <form onSubmit={handleVerifyOtp} className="space-y-4">
                 <input 
