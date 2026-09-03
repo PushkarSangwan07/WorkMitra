@@ -34,6 +34,11 @@ const refresh = async () => {
   return data.data.accessToken;
 };
 
+const verifyEmail = async (data) => {
+  const response = await api.post('/auth/verify-email', data);
+  return response.data; 
+};
+
 export default {
   register,
   login,
@@ -42,4 +47,5 @@ export default {
   forgotPassword,
   resetPassword,
   refresh,
+  verifyEmail
 };

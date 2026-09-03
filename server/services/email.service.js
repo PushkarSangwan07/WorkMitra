@@ -113,6 +113,11 @@ const sendBanNotificationEmail = async (email, name, reason) => {
   // This creates a link like: http://localhost:5173/login?appeal=true&email=worker@example.com
   const appealLink = `${clientUrl}/login?appeal=true&email=${encodeURIComponent(email)}`;
 
+  // 🚨 FIX: Agar admin ne reason nahi diya, toh default message dikhayein taaki email crash na ho
+  const suspensionReason = reason && reason.trim() !== '' 
+    ? reason 
+    : 'Violation of platform terms of service or community guidelines.';
+
   await sendEmail({
     to: email,
     subject: '⚠️ Important: Your WorkMitra Account Has Been Suspended',
@@ -121,10 +126,12 @@ const sendBanNotificationEmail = async (email, name, reason) => {
         <h2 style="color: #ef4444;">Account Suspended</h2>
         <p>Hello ${name},</p>
         <p>We are writing to inform you that your account on WorkMitra has been suspended by our administration team.</p>
+        
         <div style="background-color: #fef2f2; padding: 15px; border-left: 4px solid #ef4444; margin: 20px 0;">
           <p style="margin: 0; color: #991b1b;"><strong>Reason for suspension:</strong></p>
-          <p style="margin: 5px 0 0 0; color: #7f1d1d;">${reason}</p>
+          <p style="margin: 5px 0 0 0; color: #7f1d1d;">${suspensionReason}</p>
         </div>
+
         <p>While suspended, you will not be able to log in, accept bookings, or interact with customers.</p>
         <p>If you believe this was a mistake, you can click the button below to submit an appeal directly to our Trust & Safety team.</p>
         

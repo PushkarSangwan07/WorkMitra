@@ -92,6 +92,8 @@ const verifyEmail = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'Email and OTP code are required');
   }
 
+  otpCode = String(otpCode).trim();
+
   const user = await User.findOne({ email });
   if (!user) {
     throw new ApiError(404, 'User not found.');

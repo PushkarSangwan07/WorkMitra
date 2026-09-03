@@ -259,7 +259,7 @@ export default function Register() {
               <form onSubmit={handleVerifyOtp} className="space-y-4">
                 <input 
                   type="text" required maxLength={6} placeholder="123456"
-                  value={otpCode} onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))} 
+                  value={otpCode} onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').trim())} 
                   className="w-full h-14 bg-zinc-50/50 dark:bg-black/50 border border-zinc-200 dark:border-white/10 rounded-xl text-center text-2xl tracking-[0.5em] font-black text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all" 
                 />
                 
