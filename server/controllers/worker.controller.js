@@ -130,7 +130,7 @@ const getMyProfile = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, { worker }));
 });
 
-// PATCH /api/workers/me/profile — update own profile
+// PATCH /api/workers/me/profile — update own profile & handle onboarding upsert
 const updateMyProfile = asyncHandler(async (req, res) => {
   const updates = { ...req.body };
 
@@ -152,17 +152,15 @@ const updateMyProfile = asyncHandler(async (req, res) => {
     delete updates.state;
   }
 
+  // 🚨 FIX: 'upsert: true' add kar diya hai. 
+  // Isse agar profile nahi bani hogi toh onboarding ke waqt pehli baar create ho jayegi!
   const worker = await WorkerProfile.findOneAndUpdate(
     { user: req.user._id },
     { $set: updates },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true, upsert: true, setDefaultsOnInsert: true }
   );
 
-  if (!worker) {
-    throw new ApiError(404, 'Worker profile not found');
-  }
-
-  return res.status(200).json(new ApiResponse(200, { worker }, 'Profile updated'));
+  return res.status(200).json(new ApiResponse(200, { worker }, 'Profile published successfully!'));
 });
 
 // PATCH /api/workers/me/availability — quick toggle
