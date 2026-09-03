@@ -8,11 +8,10 @@ const registerSchema = z.object({
     .min(8, 'Password must be at least 8 characters')
     .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
     .regex(/[0-9]/, 'Password must contain at least one number'),
-  phone: z
-    .string()
-    .trim()
-    .regex(/^[6-9]\d{9}$/, 'Enter a valid 10-digit Indian phone number')
-    .optional(),
+phone: z.preprocess(
+    (val) => (val === '' || !val ? undefined : val),
+    z.string().trim().regex(/^[6-9]\d{9}$/, 'Enter a valid 10-digit Indian phone number').optional()
+  ),
   role: z.enum(['customer', 'worker']).optional(), // admin can never self-register
 });
 
