@@ -223,6 +223,18 @@ export default function Register() {
                 We sent a 6-digit code to <strong className="text-zinc-900 dark:text-white">{formData.email}</strong>
               </p>
 
+              <div className="mb-6 p-3 bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/20 rounded-xl">
+                <p className="text-xs font-bold text-orange-600 dark:text-orange-400">
+                  🛠 TEST MODE ACTIVE
+                </p>
+                <p className="text-[11px] text-orange-700/70 dark:text-orange-300/70 mt-1">
+                  Email services are temporarily bypassed for testing. <br/> 
+                  <strong>Enter ANY 6 digits (e.g., 123456) to continue.</strong>
+                </p>
+              </div>
+
+
+
               <form onSubmit={handleVerifyOtp} className="space-y-4">
                 <input 
                   type="text" required maxLength={6} placeholder="123456"
