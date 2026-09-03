@@ -51,10 +51,18 @@ export function AuthProvider({ children }) {
     return response; 
   }, []);
 
-  // 🚨 FIX 2: Naya Verify function jo OTP check hone ke baad user ko login karega
+  // 🚨 FIX: Safe response handling for verifyEmail
   const verifyEmail = useCallback(async (email, otpCode) => {
-    // Backend se verify hone ke baad accessToken milega
-    const { user: verifiedUser, accessToken } = await authService.verifyEmail({ email, otpCode });
+    const res = await authService.verifyEmail({ email, otpCode });
+    
+    // Backend response structure ke hisab se data safe nikalna (chahe .data ho ya direct)
+    const responseData = res.data || res;
+    const { user: verifiedUser, accessToken } = responseData.data || responseData;
+
+    if (!accessToken || !verifiedUser) {
+      throw new Error('Verification response missing token or user data');
+    }
+
     localStorage.setItem('accessToken', accessToken);
     setUser(verifiedUser);
     return verifiedUser;
