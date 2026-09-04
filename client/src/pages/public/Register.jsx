@@ -206,7 +206,11 @@ export default function Register() {
               <div className="relative group">
                 <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-orange-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                 <input
-                  type={showPassword ? "text" : "password"} required minLength={6} value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} placeholder="••••••••"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  placeholder="••••••••"
                   className="w-full h-12 rounded-xl border border-zinc-200 dark:border-white/10 bg-zinc-50/50 dark:bg-black/50 pl-11 pr-11 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all"
                 />
                 <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors">
@@ -215,6 +219,27 @@ export default function Register() {
                   </svg>
                 </button>
               </div>
+
+              {/* 👇 LIVE PASSWORD REQUIREMENTS CHECKLIST 👇 */}
+              {formData.password.length > 0 && (() => {
+                const hasMinLength = formData.password.length >= 8;
+                const hasUppercase = /[A-Z]/.test(formData.password);
+                const hasNumber = /[0-9]/.test(formData.password);
+
+                return (
+                  <div className="mt-2.5 space-y-1 text-xs px-1 font-mono">
+                    <p className={`flex items-center gap-1.5 transition-colors ${hasMinLength ? 'text-green-600 dark:text-green-400 font-medium' : 'text-zinc-400'}`}>
+                      <span>{hasMinLength ? '✓' : '•'}</span> At least 8 characters
+                    </p>
+                    <p className={`flex items-center gap-1.5 transition-colors ${hasUppercase ? 'text-green-600 dark:text-green-400 font-medium' : 'text-zinc-400'}`}>
+                      <span>{hasUppercase ? '✓' : '•'}</span> One uppercase letter (A-Z)
+                    </p>
+                    <p className={`flex items-center gap-1.5 transition-colors ${hasNumber ? 'text-green-600 dark:text-green-400 font-medium' : 'text-zinc-400'}`}>
+                      <span>{hasNumber ? '✓' : '•'}</span> One number (0-9)
+                    </p>
+                  </div>
+                );
+              })()}
             </div>
 
             <button

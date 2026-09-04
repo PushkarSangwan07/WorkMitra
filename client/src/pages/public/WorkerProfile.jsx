@@ -211,47 +211,77 @@ export default function WorkerProfile() {
               </div>
             </div>
 
-            {/* Action buttons */}
-            {isAuthenticated && user?.role === 'customer' && (
-              <div className="space-y-2">
+            {/* Action buttons — ab yeh hamesha dikhenge */}
+            <div className="space-y-2">
+              <button
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    toast.error('Please log in as a customer to book a worker');
+                    // Aap chahein toh navigate('/login') bhi use kar sakte hain
+                    return;
+                  }
+                  if (user?.role !== 'customer') {
+                    toast.error('Only customers can book workers');
+                    return;
+                  }
+                  setShowBooking(true);
+                }}
+                className={`w-full flex items-center justify-center gap-2 py-3 rounded-full text-white font-semibold text-sm transition-transform hover:-translate-y-0.5 ${T.amberBg}`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Book Now
+              </button>
+
+              <div className="flex gap-2">
                 <button
-                  onClick={() => setShowBooking(true)}
-                  className={`w-full flex items-center justify-center gap-2 py-3 rounded-full text-white font-semibold text-sm transition-transform hover:-translate-y-0.5 ${T.amberBg}`}
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  Book Now
-                </button>
-
-                <div className="flex gap-2">
-                  <button
-                    onClick={toggleFavorite}
-                    className={`flex-1 py-2.5 rounded-full text-sm font-semibold border-2 transition-colors ${
-                      isFavorite ? `${T.amberBorder} ${T.amber}` : `${T.hairline} ${T.ink} hover:bg-black/[0.03] dark:hover:bg-white/5`
+                  onClick={() => {
+                    if (!isAuthenticated) {
+                      toast.error('Please log in to save workers');
+                      return;
+                    }
+                    toggleFavorite();
+                  }}
+                  className={`flex-1 py-2.5 rounded-full text-sm font-semibold border-2 transition-colors ${isFavorite ? `${T.amberBorder} ${T.amber}` : `${T.hairline} ${T.ink} hover:bg-black/[0.03] dark:hover:bg-white/5`
                     }`}
+                >
+                  {isFavorite ? 'Saved' : 'Save'}
+                </button>
+                {whatsappUrl && (
+                  <a
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-full bg-[#25D366] hover:bg-[#1ebe57] text-white text-sm font-semibold transition-colors"
                   >
-                    {isFavorite ? 'Saved' : 'Save'}
-                  </button>
-                  {whatsappUrl && (
+                    Chat
+                  </a>
+                )}
 
-                    <a
-                    
-                      href={whatsappUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-full bg-[#25D366] hover:bg-[#1ebe57] text-white text-sm font-semibold transition-colors"
-                    >
-                      Chat
-                    </a>
-                  )}
-                </div>
+                <button
+          onClick={() => {
+            const profileUrl = window.location.href;
+            if (navigator.share) {
+              navigator.share({
+                title: `${workerUser?.name} - WorkMitra`,
+                text: `Check out ${workerUser?.name}'s profile on WorkMitra`,
+                url: profileUrl,
+              }).catch(() => {});
+            } else {
+              navigator.clipboard.writeText(profileUrl);
+              toast.success('Profile link copied to clipboard!');
+            }
+          }}
+          className={`px-4 py-2.5 rounded-full text-sm font-semibold border-2 transition-colors ${T.hairline} ${T.ink} hover:bg-black/[0.03] dark:hover:bg-white/5`}
+          title="Share Profile"
+        >
+          <svg className="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3.316 3.316 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3.316 3.316 0 00-5.368-2.684z" />
+          </svg>
+        </button>
               </div>
-            )}
-
-            {workerUser?.phone && (
-              <p className={`text-sm mt-2 ${T.steel}`} style={{ fontFamily: MONO }}>+91-{workerUser.phone}</p>
-            )}
+            </div>
 
             {/* Report button */}
             {isAuthenticated && user?.role === 'customer' && (
