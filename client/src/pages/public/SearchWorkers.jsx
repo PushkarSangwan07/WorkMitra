@@ -79,6 +79,7 @@ export default function SearchWorkers() {
       const result = await workerService.searchWorkers(cleanParams);
       setWorkers(result.workers || []);
       setPagination(result.pagination || { page: 1, totalPages: 1, total: 0 });
+      window.scrollTo({top:0, behavior: 'smooth'});
     } catch {
       setError('Could not load workers. Please try again.');
     } finally {
