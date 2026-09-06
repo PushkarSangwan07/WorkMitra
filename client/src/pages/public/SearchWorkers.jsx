@@ -195,10 +195,40 @@ export default function SearchWorkers() {
       </div>
 
       {/* Mobile filter drawer */}
-      {showMobileFilters && (
+      {/* {showMobileFilters && (
         <div className="fixed inset-0 z-50 md:hidden">
           <div className="absolute inset-0 backdrop-blur-sm bg-black/40 dark:bg-black/70" onClick={() => setShowMobileFilters(false)} />
           <div className={`absolute bottom-0 left-0 right-0 rounded-t-[2rem] max-h-[88vh] overflow-y-auto border-t-2 ${T.card} ${T.inkBorder}`}>
+            <div className={`sticky top-0 backdrop-blur-md px-6 py-4 border-b flex items-center justify-between z-10 bg-[#FAF8F3]/90 dark:bg-[#1E1B15]/90 ${T.hairline}`}>
+              <h2 className={`font-semibold text-lg ${T.ink}`} style={{ fontFamily: DISPLAY }}>FILTERS</h2>
+              <button onClick={() => setShowMobileFilters(false)}
+                className={`h-8 w-8 flex items-center justify-center rounded-full border-2 transition-colors ${T.inkBorder} ${T.ink}`}>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+            <div className="p-6">
+              <WorkerFilters filters={filters} onChange={setFilters} />
+              <button
+                onClick={() => setShowMobileFilters(false)}
+                className={`w-full mt-6 py-4 rounded-xl text-white font-semibold shadow-lg transition-all ${T.amberBg}`}
+                style={{ fontFamily: MONO }}
+              >
+                SHOW {pagination.total || 0} RESULTS
+              </button>
+            </div>
+          </div>
+        </div>
+      )} */}
+
+      {/* Mobile filter drawer */}
+      {showMobileFilters && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          {/* 👇 FIX: backdrop-blur-sm hata diya hai, ab sirf clean dark overlay rahega */}
+          <div className="fixed inset-0 bg-black/50 dark:bg-black/70 transition-opacity" onClick={() => setShowMobileFilters(false)} />
+          
+          <div className={`absolute bottom-0 left-0 right-0 rounded-t-[2rem] max-h-[88vh] overflow-y-auto border-t-2 z-10 ${T.card} ${T.inkBorder}`}>
             <div className={`sticky top-0 backdrop-blur-md px-6 py-4 border-b flex items-center justify-between z-10 bg-[#FAF8F3]/90 dark:bg-[#1E1B15]/90 ${T.hairline}`}>
               <h2 className={`font-semibold text-lg ${T.ink}`} style={{ fontFamily: DISPLAY }}>FILTERS</h2>
               <button onClick={() => setShowMobileFilters(false)}
